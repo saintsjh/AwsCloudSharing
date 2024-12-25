@@ -7,9 +7,9 @@ import LoadingIndicator from '@/components/Loading';
 
 export default function UploadScreen() {
   const [loading, setLoading] = useState(false);
-  const imageAnim = useRef(new Animated.Value(500)).current; // Start position off-screen
-  const textAnim = useRef(new Animated.Value(0)).current; // Start position for text
-  const fadeAnim = useRef(new Animated.Value(0)).current; // Start opacity at 0
+  const imageAnim = useRef(new Animated.Value(500)).current;
+  const textAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.timing(imageAnim, {
@@ -25,19 +25,56 @@ export default function UploadScreen() {
     }).start();
   }, [imageAnim, fadeAnim]);
 
+  const uploadToS3 = async (file: DocumentPicker.DocumentPickerAsset) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', {
+        uri: file.uri,
+        type: file.mimeType || 'application/octet-stream',
+        name: file.name,
+      } as any);
+  
+      // Construct URL with fileName as query parameter
+      const apiUrl = `https://08v3ztryn3.execute-api.us-east-1.amazonaws.com/dev2/files?fileName=${encodeURIComponent(file.name)}`;
+  
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        body: formData
+      });
+  
+      const result = await response.json();
+      console.log('Upload successful:', result);
+      return result;
+    } catch (error) {
+      console.log('Upload error:', error);
+      throw error;
+    }
+  };
+  
   const handlePress = async () => {
     setLoading(true);
-    // Handle image button press
-    console.log('Image button pressed');
-    // Use the document picker to select a file
-    let result = await DocumentPicker.getDocumentAsync({});
-    if (result.type === 'success') {
-      console.log('Selected file:', result.uri);
-      // Handle the selected file
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: '*/*',
+        copyToCacheDirectory: true
+      });
+  
+      if (!result.canceled) {
+        const file = result.assets[0];
+        console.log('Selected file:', file.uri);
+        const uploadResult = await uploadToS3(file);
+        console.log('Upload completed:', uploadResult);
+      }
+    } catch (error) {
+      console.log('Document picking error:', error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
-
+  
   return (
     <View style={styles.container}>
       <Animated.Image
@@ -78,21 +115,21 @@ const styles = StyleSheet.create({
   },
   titleText: {
     textAlign: 'center',
-    color: '#ffffff', 
-    textShadowColor: '#000', 
-    textShadowOffset: { width: 0, height: 2 }, 
-    textShadowRadius: 3, 
+    color: '#ffffff',
+    textShadowColor: '#000',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 3,
     fontSize: 30,
-    marginBottom: 20, 
+    marginBottom: 20,
   },
   image: {
     width: 100,
     height: 100,
   },
   glow: {
-    shadowColor: '#ffffff', 
-    shadowOffset: { width: 0, height: 0 }, 
-    shadowOpacity: 1, 
-    shadowRadius: 10, 
+    shadowColor: '#ffffff',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 1,
+    shadowRadius: 10,
   },
 });
