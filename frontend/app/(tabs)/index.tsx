@@ -12,6 +12,7 @@ export default function HomeScreen() {
   const welcomeAnim = useRef(new Animated.Value(-50)).current;
   const toAnim = useRef(new Animated.Value(-50)).current;
   const cloudAnim = useRef(new Animated.Value(-50)).current;
+  const fadeAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     Animated.stagger(300, [
@@ -31,7 +32,17 @@ export default function HomeScreen() {
         useNativeDriver: true,
       }),
     ]).start();
-  }, [welcomeAnim, toAnim, cloudAnim]);
+
+    const timer = setTimeout(() => {
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 1000,
+        useNativeDriver: true,
+      }).start();
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [welcomeAnim, toAnim, cloudAnim, fadeAnim]);
 
   return (
     <View style={styles.container}>
@@ -44,10 +55,16 @@ export default function HomeScreen() {
       />
       <BlurView intensity={25} style={StyleSheet.absoluteFill}>
         <ThemedView style={styles.titleContainer}>
-          <Animated.View style={{ transform: [{ translateY: welcomeAnim }] }}>
+          <Animated.View style={{ 
+            transform: [{ translateY: welcomeAnim }],
+            opacity: fadeAnim 
+          }}>
             <ThemedText type="title" style={[styles.titleText, styles.h1Text]}>Welcome</ThemedText>
           </Animated.View>
-          <Animated.View style={{ transform: [{ translateY: toAnim }] }}>
+          <Animated.View style={{ 
+            transform: [{ translateY: toAnim }],
+            opacity: fadeAnim 
+          }}>
             <ThemedText type="title" style={[styles.titleText, styles.h2Text]}>to</ThemedText>
           </Animated.View>
           <Animated.View style={{ transform: [{ translateY: cloudAnim }] }}>
@@ -76,45 +93,45 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 250, // Adjust this value to move the text lower on the screen
-    backgroundColor: 'transparent', // Ensure transparency
+    marginTop: 250,
+    backgroundColor: 'transparent',
   },
   titleText: {
     textAlign: 'center',
-    color: '#ffffff', // Ensure the text is visible
-    textShadowColor: '#000', // Shadow color
-    textShadowOffset: { width: 2, height: 2 }, // Shadow offset
-    textShadowRadius: 3, // Shadow radius
-    marginBottom: 10, // Add vertical spacing between text elements
+    color: '#ffffff',
+    textShadowColor: '#000',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 3,
+    marginBottom: 10,
   },
   h1Text: {
-    fontSize: 30, 
+    fontSize: 30,
   },
   h2Text: {
-    fontSize: 18, // Adjust this value to make the text size smaller
+    fontSize: 18,
   },
   buttonContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 20,
-    backgroundColor: 'transparent', // Ensure transparency
+    backgroundColor: 'transparent',
   },
   button: {
     padding: 10,
     backgroundColor: '#0a7ea4',
     borderRadius: 5,
-    marginVertical: 10, // Add vertical margin to separate the buttons
-    width: '60%', // Adjust the width of the buttons
-    alignItems: 'center', // Center the text inside the button
-    shadowColor: '#000', // Shadow color
-    shadowOffset: { width: 0, height: 2 }, // Shadow offset
-    shadowOpacity: 0.25, // Shadow opacity
-    shadowRadius: 3.84, // Shadow radius
-    elevation: 5, // Required for Android to show shadow
+    marginVertical: 10,
+    width: '60%',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   buttonText: {
     textAlign: 'center',
-    color: '#ffffff', // Ensure the text is white for better visibility
+    color: '#ffffff',
   },
 });
