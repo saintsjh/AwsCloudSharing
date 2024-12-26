@@ -121,14 +121,14 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#0a7ea4',
     borderRadius: 5,
-    marginVertical: 10,
-    width: '60%',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    marginVertical: 10, // Add vertical margin to separate the buttons
+    width: '60%', // Adjust the width of the buttons
+    alignItems: 'center', // Center the text inside the button
+    shadowColor: '#000', // Shadow color
+    shadowOffset: { width: 0, height: 2 }, // Shadow offset
+    shadowOpacity: 0.60, // Shadow opacity
+    shadowRadius: 5.84, // Shadow radius
+    elevation: 5, // Required for Android to show shadow
   },
   buttonText: {
     textAlign: 'center',
