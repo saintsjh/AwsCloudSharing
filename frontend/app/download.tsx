@@ -183,10 +183,10 @@ export default function DownloadScreen() {
   return (
     <View style={styles.container}>
       <Animated.Image
-        source={require('@/assets/images/shelf.jpg')}
+        source={require('@/assets/images/shelf2.avif')}
         style={[styles.backgroundImage, { opacity: fadeAnim }]}
       />
-      <BlurView intensity={50} style={StyleSheet.absoluteFill}>
+      <BlurView intensity={30} style={StyleSheet.absoluteFill}>
         <View style={styles.contentContainer}>
           {!showFileList ? (
             <>
