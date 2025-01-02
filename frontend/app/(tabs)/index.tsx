@@ -4,7 +4,6 @@ import { Link } from 'expo-router';
 import { Video, ResizeMode } from 'expo-av';
 import { BlurView } from 'expo-blur';
 
-import { HelloWave } from '@/components/HelloWave';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
@@ -70,7 +69,6 @@ export default function HomeScreen() {
           <Animated.View style={{ transform: [{ translateY: cloudAnim }] }}>
             <ThemedText type="title" style={styles.titleText}>Cloud File Sharing</ThemedText>
           </Animated.View>
-          <HelloWave />
         </ThemedView>
         <ThemedView style={styles.buttonContainer}>
           <Link href="/upload" style={styles.button}>
