@@ -27,32 +27,48 @@ export default function UploadScreen() {
 
   const uploadToS3 = async (file: DocumentPicker.DocumentPickerAsset) => {
     try {
-      const formData = new FormData();
-      formData.append('file', {
-        uri: file.uri,
-        type: file.mimeType || 'application/octet-stream',
-        name: file.name,
-      } as any);
-  
-      // Construct URL with fileName as query parameter
-      const apiUrl = `https://08v3ztryn3.execute-api.us-east-1.amazonaws.com/dev2/files?fileName=${encodeURIComponent(file.name)}`;
-  
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        body: formData
+      // Read file as base64
+      const response = await fetch(file.uri);
+      const blob = await response.blob();
+      const base64Data = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64 = reader.result as string;
+          resolve(base64.split(',')[1]); // Remove data URL prefix
+        };
+        reader.readAsDataURL(blob);
       });
   
-      const result = await response.json();
-      console.log('Upload successful:', result);
-      return result;
+      const apiUrl = `https://08v3ztryn3.execute-api.us-east-1.amazonaws.com/dev2/files?fileName=${encodeURIComponent(file.name)}`;
+      
+      // Send as JSON payload
+      const uploadResponse = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          fileName: file.name,
+          fileContent: base64Data,
+          mimeType: file.mimeType
+        })
+      });
+  
+      if (!uploadResponse.ok) {
+        const errorText = await uploadResponse.text();
+        throw new Error(`Upload failed: ${errorText}`);
+      }
+      
+      return await uploadResponse.json();
     } catch (error) {
       console.log('Upload error:', error);
       throw error;
     }
   };
+  
+  
+  
   
   const handlePress = async () => {
     setLoading(true);
